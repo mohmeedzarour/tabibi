@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>طبيبي الذكي – فحص أولي لصور الشبكية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f1;--card:#fff;--ink:#12263a;--muted:#5a6b78;--accent:#0e7c7b;--line:#d5e0dc;--band:#12263a;--bandtext:#fff;--ok:#2f855a;--warn:#c05621;--bad:#c53030;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a24;--card:#142634;--ink:#e8f0f2;--muted:#9db0ba;--accent:#4fd1c5;--line:#274255;--band:#0a141c;--bandtext:#e8f0f2;--ok:#68d391;--warn:#f6ad55;--bad:#fc8181}}
+:root[data-theme="dark"]{--bg:#0d1a24;--card:#142634;--ink:#e8f0f2;--muted:#9db0ba;--accent:#4fd1c5;--line:#274255;--band:#0a141c;--bandtext:#e8f0f2;--ok:#68d391;--warn:#f6ad55;--bad:#fc8181}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal","Segoe UI",Tahoma,sans-serif;line-height:1.75}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px}
+header{background:var(--band);color:var(--bandtext);padding:28px 0 32px}
+header h1{margin:0;font-size:2rem;font-weight:800}
+header p{margin:6px 0 0;opacity:.85;max-width:34em}
+nav{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+nav a{color:var(--bandtext);opacity:.85;text-decoration:none;border-bottom:2px solid transparent}
+nav a:hover,nav a:focus-visible{border-color:#4fd1c5;opacity:1;outline:none}
+section{padding:28px 0 4px}
+h2{font-size:1.3rem;margin:0 0 10px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+button,.file{font:inherit;font-weight:700;border:1px solid var(--accent);background:transparent;color:var(--accent);padding:9px 16px;border-radius:10px;cursor:pointer}
+button.main,.file.main{background:var(--accent);color:var(--card)}
+button:focus-visible,.file:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.file input{position:absolute;opacity:0;width:1px;height:1px}
+.stage{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:620px){.stage{grid-template-columns:260px 1fr}}
+.view{aspect-ratio:1;background:#05090d;border-radius:12px;display:grid;place-items:center;overflow:hidden;color:#9db0ba;text-align:center;padding:10px}
+canvas{width:100%;height:100%;display:block}
+.meter{height:12px;border-radius:6px;background:var(--line);overflow:hidden;margin:8px 0 12px}
+.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .6s,background .3s}
+.verdict{font-size:1.25rem;font-weight:800;margin:0}
+ul{margin:8px 0;padding-inline-start:20px}
+.note{color:var(--muted);font-size:.9rem}
+dl{margin:0}.row{padding:10px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+dt{color:var(--accent);font-weight:700;font-size:.9rem}dd{margin:0}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;padding:10px 44px 10px 0;position:relative;border-bottom:1px solid var(--line)}
+ol.steps li:last-child{border:0}
+ol.steps li::before{content:counter(s);position:absolute;right:0;top:10px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--card);display:grid;place-items:center;font-weight:800}
+.two{display:grid;gap:12px}@media(min-width:620px){.two{grid-template-columns:1fr 1fr}}
+.two h3{margin:0 0 4px;font-size:1rem}
+.designer{text-align:center;padding:30px 0 24px;color:var(--muted)}
+.designer strong{display:block;color:var(--ink);font-size:1.2rem}
+footer{background:var(--band);color:var(--bandtext);text-align:center;font-weight:700;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>طبيبي الذكي</h1>
+<p>نظام ذكاء اصطناعي للكشف المبكر عن أمراض العيون من صور الشبكية، من الرؤية الحاسوبية.</p>
+<nav><a href="#try">جرّب الفحص</a><a href="#how">كيف يعمل</a><a href="#card">بطاقة التعريف</a></nav>
+</div></header>
+
+<main class="wrap">
+<section id="try">
+<h2>فحص صورة شبكية</h2>
+<div class="box">
+<div class="btns">
+<label class="file main">ارفع صورة شبكية<input type="file" id="file" accept="image/*"></label>
+<button id="sampleOk">صورة تجريبية سليمة</button>
+<button id="sampleBad">صورة تجريبية بها آفات</button>
+</div>
+<div class="stage">
+<div class="view" id="view"><span>لا توجد صورة بعد. ارفع صورة أو اختر صورة تجريبية.</span></div>
+<div aria-live="polite">
+<p class="verdict" id="verdict">بانتظار الصورة</p>
+<div class="meter"><i id="bar"></i></div>
+<div id="details" class="note">سيحلل النظام لون الصورة ويبحث عن بقع داكنة حمراء (تشبه النزف) وبقع صفراء ساطعة (تشبه الإفرازات).</div>
+</div>
+</div>
+<p class="note">هذا عرض تعليمي يحسب مؤشرات بسيطة من ألوان الصورة، ولا يستبدل نموذجاً مدرَّباً ولا الطبيب.</p>
+</div>
+</section>
+
+<section id="how">
+<h2>كيف يعمل النظام</h2>
+<div class="box"><ol class="steps">
+<li><b>استقبال الصورة:</b> تُقرأ صورة الشبكية وتُصغَّر إلى حجم ثابت.</li>
+<li><b>الرؤية الحاسوبية:</b> يفحص النظام كل بكسل ويستبعد الخلفية السوداء حول الشبكية.</li>
+<li><b>استخراج المؤشرات:</b> يقيس نسبة البقع الداكنة الحمراء والبقع الصفراء الساطعة.</li>
+<li><b>القرار:</b> يجمع المؤشرات في درجة خطورة، ثم يوصي بمراجعة الطبيب عند ارتفاعها.</li>
+</ol>
+<p class="note">في النسخة الكاملة يحل محل الخطوتين 3 و4 نموذج تعلم عميق مكتوب بلغة Python باستخدام TensorFlow أو PyTorch ومدرَّب على آلاف الصور.</p>
+</div>
+</section>
+
+<section id="card">
+<h2>بطاقة التعريف</h2>
+<div class="box"><dl>
+<div class="row"><dt>اسم النظام</dt><dd>طبيبي الذكي</dd></div>
+<div class="row"><dt>الفرع الذي ينتمي إليه</dt><dd>الرؤية الحاسوبية</dd></div>
+<div class="row"><dt>نوعه حسب القدرات</dt><dd>ذكاء اصطناعي ضعيف (محدود)</dd></div>
+<div class="row"><dt>نوعه حسب الوظيفة</dt><dd>ذاكرة محدودة</dd></div>
+<div class="row"><dt>المشكلة التي يحلّها</dt><dd>الكشف المبكر عن أمراض العيون من صور الشبكية</dd></div>
+<div class="row"><dt>لغة البرمجة المناسبة ولماذا</dt><dd>Python، لمرونتها وكثرة مكتباتها مثل TensorFlow و PyTorch</dd></div>
+</dl>
+<div class="two" style="margin-top:12px">
+<div><h3>إحدى ميزاته</h3>سرعة التشخيص ودقته</div>
+<div><h3>أحد حدوده</h3>يحتاج إلى بيانات كثيرة ولا يحلّ محل الطبيب</div>
+</div></div>
+</section>
+
+<div class="designer">المصمم<strong>محمد جمال محمد زعرور</strong></div>
+</main>
+
+<footer>كل الشكر للدكتورة الرائعة روان صالح</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+const view = $("view");
+
+function seeded(seed){ return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+
+function sample(lesions){
+  const c = document.createElement("canvas"); c.width = c.height = 300;
+  const g = c.getContext("2d"), R = seeded(lesions ? 42 : 7);
+  g.fillStyle = "#000"; g.fillRect(0,0,300,300);
+  const grad = g.createRadialGradient(150,150,10,150,150,140);
+  grad.addColorStop(0,"#e0864a"); grad.addColorStop(1,"#b8512a");
+  g.fillStyle = grad; g.beginPath(); g.arc(150,150,140,0,7); g.fill();
+  g.strokeStyle = "#8a2f1c"; g.lineWidth = 3;
+  for(let i=0;i<9;i++){ const a = i*0.7; g.beginPath(); g.moveTo(205,140); g.quadraticCurveTo(150+Math.cos(a)*70,150+Math.sin(a)*70,150+Math.cos(a)*125,150+Math.sin(a)*125); g.stroke(); }
+  g.fillStyle = "#f0c27a"; g.beginPath(); g.arc(205,140,16,0,7); g.fill();
+  if(lesions){
+    for(let i=0;i<26;i++){ const a=R()*6.28, r=R()*100; g.fillStyle="#5a0f0f"; g.beginPath(); g.arc(150+Math.cos(a)*r,150+Math.sin(a)*r,3+R()*5,0,7); g.fill(); }
+    for(let i=0;i<14;i++){ const a=R()*6.28, r=R()*95; g.fillStyle="#f5e27a"; g.beginPath(); g.arc(150+Math.cos(a)*r,150+Math.sin(a)*r,3+R()*5,0,7); g.fill(); }
+  }
+  return c;
+}
+
+function analyze(src){
+  const c = document.createElement("canvas"); c.width = c.height = 128;
+  const g = c.getContext("2d"); g.drawImage(src,0,0,128,128);
+  const d = g.getImageData(0,0,128,128).data;
+  let retina = 0, dark = 0, yellow = 0;
+  for(let i=0;i<d.length;i+=4){
+    const r=d[i], gr=d[i+1], b=d[i+2], lum=(r+gr+b)/3;
+    if(lum < 25) continue;
+    retina++;
+    if(r>50 && r<130 && gr<45 && b<45) dark++;
+    else if(r>210 && gr>190 && b<150) yellow++;
+  }
+  const total = 128*128;
+  if(retina/total < 0.25) return {invalid:true};
+  const df = dark/retina, yf = yellow/retina;
+  const score = Math.min(100, Math.round(df*1800 + Math.max(0,yf-0.015)*1500));
+  return {score, df, yf};
+}
+
+function show(src){
+  view.replaceChildren(); const cv = document.createElement("canvas");
+  cv.width = cv.height = 300; cv.getContext("2d").drawImage(src,0,0,300,300); view.appendChild(cv);
+  const res = analyze(src), bar = $("bar"), v = $("verdict"), det = $("details");
+  if(res.invalid){
+    v.textContent = "الصورة غير واضحة"; bar.style.width = "0";
+    det.innerHTML = "لا تبدو هذه صورة شبكية. ارفع صورة قاع العين على خلفية داكنة.";
+    return;
+  }
+  const s = res.score; bar.style.width = Math.max(s,4) + "%";
+  let label, color, advice;
+  if(s < 20){ label = "لا مؤشرات مقلقة"; color = "var(--ok)"; advice = "استمر في الفحص الدوري السنوي."; }
+  else if(s < 55){ label = "مؤشرات تستدعي المتابعة"; color = "var(--warn)"; advice = "يُنصح بمراجعة طبيب العيون قريباً."; }
+  else { label = "مؤشرات مرتفعة"; color = "var(--bad)"; advice = "يُنصح بمراجعة طبيب العيون بأسرع وقت."; }
+  bar.style.background = color; v.textContent = label; v.style.color = color;
+  det.innerHTML = "<ul><li>درجة الخطورة: " + s + " من 100</li><li>بقع داكنة حمراء: " + (res.df*100).toFixed(1) + "% من الشبكية</li><li>بقع صفراء ساطعة: " + (res.yf*100).toFixed(1) + "% من الشبكية</li></ul><b>" + advice + "</b>";
+}
+
+$("sampleOk").onclick = () => show(sample(false));
+$("sampleBad").onclick = () => show(sample(true));
+$("file").onchange = e => {
+  const f = e.target.files[0]; if(!f) return;
+  const img = new Image(); img.onload = () => show(img); img.src = URL.createObjectURL(f);
+};
+</script>
+</body>
+</html>
